@@ -7,7 +7,7 @@ from mpl_toolkits.mplot3d import Axes3D
 import matplotlib as mpl
 import random
 
-interval = (-3, 3)
+interval = (-5, 5)
 
 def simulated_annealing(random_start, cost_function, num_variables, random_neighbour, acceptance, temperature, maxsteps=1000):
     """ Optimize the black-box function 'cost_function' with the simulated annealing algorithm."""
@@ -83,7 +83,7 @@ def plot_annealing(states, costs, cost_function, num_variables):
         X, Y = np.meshgrid(x, y)
         zs = np.array(cost_function(np.ravel(X), np.ravel(Y)))
         Z = zs.reshape(X.shape)
-        ax1.plot_surface(X, Y, Z, alpha = 0.3, cmap='hot')
+        ax1.plot_surface(X, Y, Z, alpha = 0.1, cmap='winter')
         ax1.set_xlabel('x')
         ax1.set_ylabel('y')
         ax1.set_zlabel('f(x, y)')
@@ -92,6 +92,8 @@ def plot_annealing(states, costs, cost_function, num_variables):
         ax2 = fig.add_subplot(122)
         ax2.plot(costs, 'b')
         ax2.set_title("Costs")
+        ax2.set_xlabel('Step')
+        ax2.set_ylabel('Cost')
 
     elif num_variables == 1: 
         plt.figure(figsize = (20, 10))
@@ -99,9 +101,13 @@ def plot_annealing(states, costs, cost_function, num_variables):
         plt.subplot(121)
         plt.plot(states[0], 'r')
         plt.title("States")
+        plt.xlabel("Step")
+        plt.ylabel("x")
         plt.subplot(122)
         plt.plot(costs, 'b')
         plt.title("Costs")
+        plt.xlabel("Step")
+        plt.ylabel("Cost")
         plt.show()
 
 def visualize_annealing(cost_function, num_variables):
@@ -117,6 +123,12 @@ def visualize_annealing(cost_function, num_variables):
     return state, c
 
 if __name__=="__main__":
-    visualize_annealing(lambda x: x**2, 1)
     visualize_annealing(lambda x, y: x**2 + y**2, 2)
+    visualize_annealing(lambda x: np.abs(x)**2, 1)
+    visualize_annealing(lambda x: x * np.sin(x), 1)
+    a = 20
+    b = 0.2
+    c = 2 * np.pi
+    visualize_annealing(lambda x, y: -a * np.exp(-b * np.sqrt((x ** 2 + y ** 2) / 2)) - np.exp((np.cos(c * x) + np.cos(c * y)) / 2) + a + np.exp(1), 2)
+    visualize_annealing(lambda x, y: 10 * 2 + x ** 2 - 10 * np.cos(2 * np.pi * x) + y ** 2 - 10 * np.cos(2 * np.pi * y), 2)
     visualize_annealing(lambda x, y: (x**2 - y**2) * np.sin(x + y) / (x**2 + y**2), 2)
