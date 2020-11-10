@@ -1,4 +1,6 @@
-# Simulated Annealing
+"""
+#Simulated Annealing
+"""
 
 import numpy as np
 import numpy.random as rn
@@ -8,9 +10,12 @@ import matplotlib as mpl
 import random
 
 interval = (-5, 5)
+maxsteps = 1000
 
-def simulated_annealing(random_start, cost_function, num_variables, random_neighbour, acceptance, temperature, maxsteps=1000):
-    """Optimize the given 'cost_function' with the simulated annealing algorithm."""
+"""Implementation of Simulated Annealing algorithm."""
+
+def simulated_annealing(random_start, cost_function, num_variables, random_neighbour, acceptance, temperature):
+    """ Optimize the given 'cost_function' with the simulated annealing algorithm."""
     state_X = random_start()
     state_Y = random_start()
     cost = 0
@@ -32,7 +37,7 @@ def simulated_annealing(random_start, cost_function, num_variables, random_neigh
         T = temperature(fraction)
         new_state_X = random_neighbour(state_X, fraction)
         new_state_Y = random_neighbour(state_Y, fraction)
-        new_cost = []
+        new_cost = 0
 
         if num_variables == 2:
           new_cost = cost_function(new_state_X, new_state_Y)
@@ -47,6 +52,8 @@ def simulated_annealing(random_start, cost_function, num_variables, random_neigh
             costs.append(cost)
     
     return [state_X, state_Y], costs[-1], states, costs
+
+"""Implementation of some helper function."""
 
 def clip(x):
     """ Force x to be in the interval."""
@@ -72,6 +79,8 @@ def acceptance_probability(cost, new_cost, temperature):
 def temperature(fraction):
     """Example of temperature dicreasing as the process goes on."""
     return max(0.01, min(1, 1 - fraction))
+
+"""Implementation of an abstraction layer to plot graphs and see result of any passed function."""
 
 def plot_annealing(states, costs, cost_function, num_variables):
     """Plots 1 variable or 2 variable functions, the states and costs."""
@@ -113,22 +122,119 @@ def plot_annealing(states, costs, cost_function, num_variables):
 def visualize_annealing(cost_function, num_variables):
     """A one liner function to call Simulated Annealing on the passed function, log the result and plot the graphs."""
 
-    final_state, final_cost, states, costs = simulated_annealing(random_start, cost_function, num_variables, random_neighbour, acceptance_probability, temperature, maxsteps=10000)
+    final_state, final_cost, states, costs = simulated_annealing(random_start, cost_function, num_variables, random_neighbour, acceptance_probability, temperature)
     if num_variables == 2:
       print("Global Minima at x = {0}, y = {1}, for which, the value of f(x, y) = {2}.".format(final_state[0], final_state[1], final_cost))
     elif num_variables == 1:
       print("Global Minima at x = {0}, for which, the value of f(x) = {1}.".format(final_state[0], final_cost))
 
     plot_annealing(states, costs, cost_function, num_variables)
-    return state, c
 
-if __name__=="__main__":
-    visualize_annealing(lambda x, y: x**2 + y**2, 2)
-    visualize_annealing(lambda x: np.abs(x)**2, 1)
-    visualize_annealing(lambda x: x * np.sin(x), 1)
-    a = 20
-    b = 0.2
-    c = 2 * np.pi
-    visualize_annealing(lambda x, y: -a * np.exp(-b * np.sqrt((x ** 2 + y ** 2) / 2)) - np.exp((np.cos(c * x) + np.cos(c * y)) / 2) + a + np.exp(1), 2)
-    visualize_annealing(lambda x, y: 10 * 2 + x ** 2 - 10 * np.cos(2 * np.pi * x) + y ** 2 - 10 * np.cos(2 * np.pi * y), 2)
-    visualize_annealing(lambda x, y: (x**2 - y**2) * np.sin(x + y) / (x**2 + y**2), 2)
+"""Testing different benchmark functions"""
+
+"""
+#### Sphere Function 
+
+$f(\textbf{x}) = f(x_1, x_2, ..., x_n) = {\sum_{i=1}^{n} x_i^{2}}$
+
+#### Input Domain
+
+The function can be defined on any input domain but it is usually evaluated on the hypercube $x_i ∈ [−5.12, 5.12]$ for $i=1,2.$
+
+#### Global Minima
+
+$f(x^*) = 0$ at $x^* = (0, 0)$
+"""
+
+maxsteps = 500
+interval = (-5.12, 5.12)
+visualize_annealing(lambda x, y: x**2 + y**2, 2)
+
+"""#### Schwefel 2.20 Function 
+
+$f(\mathbf x)=f(x_1, ..., x_n)=\sum_{i=1}^n |x_i|$
+
+
+#### Input Domain
+
+The function can be defined on any input domain but it is usually evaluated on the hypercube $x_i ∈ [−100, 100]$ for $i=1,2.$
+
+#### Global Minima
+
+$f(x^*) = 0$ at $x^* = (0, 0)$
+"""
+
+maxsteps = 400
+interval = (-100, 100)
+visualize_annealing(lambda x, y: np.abs(x) + np.abs(y), 2)
+
+"""#### Schwefel Function
+
+$f(\textbf{x}) = f(x_1, x_2, ..., x_n) = {\sum_{i=1}^{n} x_i sin(x_i)}$
+
+#### Input Domain
+
+The function can be defined on any input domain but it is usually evaluated on the hypercube $x_i ∈ [−5, 5]$ for $i=1.$
+
+#### Global Minima
+
+$f(x^*) = -4.81447$ at $x^* = (4.91318)$ or $(-4.91318)$
+"""
+
+maxsteps = 800
+interval = (-5, 5)
+visualize_annealing(lambda x: x * np.sin(x), 1)
+
+"""#### Ackley Function
+
+$f(\textbf{x}) = f(x_1, ..., x_n)= -a.exp(-b\sqrt{\frac{1}{n}\sum_{i=1}^{n}x_i^2})-exp(\frac{1}{n}\sum_{i=1}^{n}cos(cx_i))+ a + exp(1)$
+
+#### Input Domain
+
+The function can be defined on any input domain but it is usually evaluated on the hypercube $x_i ∈ [−32, 32]$ for $a=20, b = 0.2, c = 2\pi$ and $i=1,2.$
+
+#### Global Minima
+
+$f(x^*) = 0$ at $x^* = (0, 0)$
+"""
+
+maxsteps = 1000
+interval = (-32, 32)
+a = 20
+b = 0.2
+c = 2 * np.pi
+visualize_annealing(lambda x, y: -a * np.exp(-b * np.sqrt((x ** 2 + y ** 2) / 2)) - np.exp((np.cos(c * x) + np.cos(c * y)) / 2) + a + np.exp(1), 2)
+
+"""#### Rastrigin Function
+
+$f(x, y)=10n + \sum_{i=1}^{n}(x_i^2 - 10cos(2\pi x_i))$
+
+#### Input Domain
+
+The function can be defined on any input domain but it is usually evaluated on the hypercube $x_i ∈ [−5.12, 5.12]$ for $i=1, 2.$
+
+#### Global Minima
+
+$f(x^*) = 0$ at $x^* = (0, 0)$
+"""
+
+maxsteps = 5000
+interval = (-5.12, 5.12)
+visualize_annealing(lambda x, y: 10 * 2 + x ** 2 - 10 * np.cos(2 * np.pi * x) + y ** 2 - 10 * np.cos(2 * np.pi * y), 2)
+
+"""#### Butterfly Function
+
+$f(x, y) = \dfrac{(x^2 - y^2) sin(x+y)}{(x^2 + y^2)}$
+
+#### Input Domain
+
+The function can be defined on any input domain but it is usually evaluated on the hypercube $x_i ∈ [−10, 10]$ for $i=1, 2.$
+
+#### Global Minima
+
+No global minima can be determined for this function.
+"""
+
+maxsteps = 1000
+interval = (-10, 10)
+visualize_annealing(lambda x, y: (x**2 - y**2) * np.sin(x + y) / (x**2 + y**2), 2)
