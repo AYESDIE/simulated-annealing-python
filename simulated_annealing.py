@@ -10,7 +10,7 @@ import random
 interval = (-5, 5)
 
 def simulated_annealing(random_start, cost_function, num_variables, random_neighbour, acceptance, temperature, maxsteps=1000):
-    """ Optimize the black-box function 'cost_function' with the simulated annealing algorithm."""
+    """Optimize the given 'cost_function' with the simulated annealing algorithm."""
     state_X = random_start()
     state_Y = random_start()
     cost = 0
@@ -113,11 +113,11 @@ def plot_annealing(states, costs, cost_function, num_variables):
 def visualize_annealing(cost_function, num_variables):
     """A one liner function to call Simulated Annealing on the passed function, log the result and plot the graphs."""
 
-    state, c, states, costs = simulated_annealing(random_start, cost_function, num_variables, random_neighbour, acceptance_probability, temperature, maxsteps=1000)
+    final_state, final_cost, states, costs = simulated_annealing(random_start, cost_function, num_variables, random_neighbour, acceptance_probability, temperature, maxsteps=10000)
     if num_variables == 2:
-      print("Global Minima at x = {0}, y = {1}, for which, the value of f(x, y) = {2}.".format(state[0], state[1], c))
+      print("Global Minima at x = {0}, y = {1}, for which, the value of f(x, y) = {2}.".format(final_state[0], final_state[1], final_cost))
     elif num_variables == 1:
-      print("Global Minima at x = {0}, for which, the value of f(x) = {1}.".format(state[0], c))
+      print("Global Minima at x = {0}, for which, the value of f(x) = {1}.".format(final_state[0], final_cost))
 
     plot_annealing(states, costs, cost_function, num_variables)
     return state, c
